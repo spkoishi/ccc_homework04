@@ -1,0 +1,106 @@
+\documentclass[a4paper]{ctexart}
+
+\usepackage{xltxtra}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{subfigure}
+\usetikzlibrary{positioning, shapes.geometric}
+
+
+\title{Mandelbrot Set的生成和探索}
+\author{蔡聪聪\\信息与计算科学 3180102279}
+\date{}
+\bibliographystyle{plain}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+ 研究了复迭代 \verb|Mandelbrot Set|的数学理论及生成算法,给出了不同参数条件下 \verb|Mandelbrot Set|图像变化的情况\par
+\textbf{关键字：}\verb|Mandelbrot Set|
+\end{abstract}
+
+
+\verb|Mandelbrot Set|能生成非常美丽的图案,本文将研究其生成的原理,探索生成的结果.
+\section{问题的背景介绍}
+\verb|Mandelbrot Set|是一个几何图形,曾被称为“上帝的指纹”.这个点集均出自公式: $z_{n+1}=z_n^2+c$,对于非线性迭代公式 $z_{n+1}=z_n^2+c$,所有使得无限迭代后的结果能保持有限数值的复数 \verb|z|的集合连通的 \verb|c| 构成 \verb|Mandelbrot Set|.\cite{ztr2013hd}它是曼德勃罗教授在二十世纪七十年代发现的.
+\section{数学理论}
+本文的算法基于以下理论.
+\newtheorem{lemma}{定理}
+\begin{lemma}
+  $c \notin M$当且仅当存在$n \in N^+$,使得$|z_n|>2$.
+\end{lemma}
+
+\begin{proof}
+分别探讨$|c|>2$与$|c|\leq 2$两种情形,首先证明$|c| \leq 2$时的情况:\par
+假设$|z_n|>2$.因为$|c| \leq 2$,故$|z_n|>|c|$.
+因为$|z_n|>|c|,|z_n|>2$,故$|z_{n+1}|=|z_n^2+c|\geq|z_n|^2-|c|>|z_n|^2-|z_n|>2|z_n|-|z_n|=|z_n|$.
+由以上可知$|z_{n+1}|>|z_n|$.由数学归纳法可知$2<|{z_n}|<|z_{n+1}|<|z_{n+2}|<...,$ 可看出随着迭代次数增加$|z_n|$逐渐递增并发散.即$c\notin M$\par
+同理,$|z_{n}|>2,(n=1,2,...)$且$|c|>2$时,$c\notin M$.\par
+综合上述可得知不论$|c|$为多少,若$|z_n|>2$,则$c\notin M$.
+\end{proof}
+
+\section{算法:计算Mandelbrot Set并生成黑白图像}
+\centering
+\begin{tikzpicture}[node distance=2cm]
+  \node[draw, rounded corners]                        (start)   {定义初始数据:复数域C,最大迭代次数N};
+  \node[draw, below=of start]                         (step 1)  {$n=0,z=0$.对每个$c\in C$};
+  \node[draw, below=of step 1]                        (step 2)  {迭代:$z=z^2+c, n=n+1$};
+  \node[draw, diamond, aspect=2, below=of step 2]     (choice)  {判断:$n>N?$};
+  \node[draw, diamond, aspect=2,right=30pt of choice] (step x)  {判断:$|z|<2?$};
+  \node[draw, rounded corners, below=30pt of choice]  (end1)     {c点为黑色};
+  \node[draw, rounded corners, below=30pt of step x]  (end2)     {c点为白色};
+  
+  \draw[->] (start)  -- (step 1);
+  \draw[->] (step 1) -- (step 2);
+  \draw[->] (step 2) -- (choice);
+  \draw[->] (choice) -- node[left]  {是} (end1);
+  \draw[->] (choice) -- node[above] {否} (step x);
+  \draw[->] (step x) -- node[right] {是} (step x|-step 2) ->  (step 2);
+  \draw[->] (step x) -- node[left]  {否} (end2);
+\end{tikzpicture}
+
+\section{数值算例}
+\raggedright\verb|Mandelbrot set|的生成图像的样子由3个要素决定,图像的生成起点$(ox,oy)$,图像的维度\verb|dimension|,最大迭代次数\verb|N|.\\
+下面给出不同参数的生成图像:
+
+
+\begin{figure}[H]
+\centering  
+\subfigure[$N=10,(ox,oy)=(0,0),d=2$]{
+\label{Fig.1}
+\includegraphics[width=0.45\textwidth]{Mabmp/N10.bmp}}
+\subfigure[$N=20,(ox,oy)=(0,0),d=2$]{
+\label{Fig.2}
+\includegraphics[width=0.45\textwidth]{Mabmp/N20.bmp}}
+\subfigure[$N=50,(ox,oy)=(0,0),d=2$]{
+\label{Fig.3}
+\includegraphics[width=0.45\textwidth]{Mabmp/N50.bmp}}
+\subfigure[$N=100,(ox,oy)=(0,0),d=2$]{
+\label{Fig.4}
+\includegraphics[width=0.45\textwidth]{Mabmp/N100.bmp}}
+\subfigure[$N=100,(ox,oy)=(0,0.5),d=2$]{
+\label{Fig.5}
+\includegraphics[width=0.45\textwidth]{Mabmp/Y05.bmp}}
+\subfigure[$N=100,(ox,oy)=(0,0.5),d=0.5$]{
+\label{Fig.6}
+\includegraphics[width=0.45\textwidth]{Mabmp/d05.bmp}}
+\end{figure}
+
+由上可得\verb|Mandelbrot Set|的生成图像关于实轴对称\\
+由图\ref{Fig.1},\ref{Fig.2},\ref{Fig.3},\ref{Fig.4}可以看出,随着最大迭代次数\verb|N|的增加,图的细节便多了,原本的线段变得更加光滑.\\
+由图\ref{Fig.4},\ref{Fig.5}可以看出$(ox,oy)$的改变会引起图像位置的改变,图\ref{Fig.5}中$oy=0.5$,故图像向下移动了$0.5$个单位.\\
+由图\ref{Fig.5},\ref{Fig.6}可以看出维度的改变会产成一个放缩效果,图\ref{Fig.6}中维度变小了,实际表现效果就是图片的局部放大.
+
+\section{结论}
+\verb|Mandelbrot Set|生成算法的数学原理是$|z_n|>2$能推出$c \notin M$,算法由循环语句配合判断条件实现.其生成图会随着最大迭代次数变得更精细光滑,位置与大小也能通过参数调整.
+
+\bibliography{books}
+\end{document}
