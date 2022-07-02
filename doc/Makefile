@@ -1,4 +1,4 @@
-make report:
+report:
 	xelatex Mandelbrot
 	bibtex Mandelbrot
 	xelatex Mandelbrot
